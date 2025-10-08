@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - {{ student.name|default:'Error' }}</title>
+    <style>
+        /* Base Styles */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f0f2f5; 
+            color: #333; 
+            margin: 0; 
+            padding: 0; 
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 20px auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+        }
+
+        /* Header & Titles */
+        h1 { 
+            color: #004d99; /* Deep Blue */
+            text-align: center; 
+            font-size: 2.2em; 
+            margin-bottom: 10px; 
+        }
+        .header-section {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        h2 { 
+            color: #007bff; /* Primary Blue */
+            font-size: 1.5em; 
+            margin-top: 30px; 
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #ffc107; /* Accent Yellow */
+        }
+        
+        /* Info Card Styling */
+        .info-card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #007bff;
+            margin-bottom: 20px;
+        }
+        .info-card p {
+            margin: 8px 0;
+            font-size: 1.05em;
+        }
+        .info-card strong {
+            color: #004d99;
+        }
+
+        /* Table Styling */
+        table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0;
+            margin-top: 15px; 
+            background: #fff; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        th, td { 
+            padding: 15px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #e9f5ff; /* Light Blue Header */
+            font-weight: 700; 
+            color: #004d99;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        tr:nth-child(even) { /* Zebra stripes */
+            background-color: #f9f9f9;
+        }
+        tr:hover { 
+            background-color: #e0f2ff; /* Lighter Blue on hover */
+            transition: background-color 0.3s;
+        }
+
+        /* Status Colors */
+        .score-highlight {
+            font-size: 1.1em;
+            font-weight: 900;
+            color: #004d99;
+        }
+        .present { 
+            color: #28a745; /* Green */
+            font-weight: bold; 
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #e6ffe6;
+            display: inline-block;
+        }
+        .absent { 
+            color: #dc3545; /* Red */
+            font-weight: bold; 
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #ffe6e6;
+            display: inline-block;
+        }
+        .late { 
+            color: #ffc107; /* Orange/Yellow */
+            font-weight: bold; 
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #fff9e6;
+            display: inline-block;
+        }
+        
+        /* Error/Alert Styling */
+        .alert-error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+            padding: 20px; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                padding: 15px;
+                border-radius: 0;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.3em;
+                margin-top: 20px;
+            }
+            /* Make tables scrollable on small screens */
+            .table-responsive {
+                overflow-x: auto;
+            }
+            table {
+                display: block;
+                width: 100%;
+                min-width: 550px; /* Ensure content doesn't squeeze too much */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="header-section">
+            {% if error_message %}
+                <h1>School Performance Dashboard</h1>
+                <div class="alert-error">{{ error_message }}</div>
+                <p style="text-align: center; margin-top: 20px; color: #555;">You attempted to view the dashboard for email: <strong>{{ parent_email }}</strong></p>
+            {% else %}
+                <h1>{{ student.name }}'s Academic Report</h1>
+                <p style="text-align: center; color: #555;">Welcome, Parent of <strong>{{ student.name }}</strong>. Viewing performance linked to: <em>{{ student.parent_email }}</em></p>
+            {% endif %}
+        </div>
+        
+
+        {% if not error_message %}
+
+            <!-- STUDENT INFO CARD -->
+            <div class="info-card">
+                <h2>Student Information</h2>
+                <p><strong>Roll Number:</strong> {{ student.roll_number }}</p>
+                <p><strong>Class Teacher:</strong> {{ student.class_teacher.name|default:'(Not Assigned)' }}</p>
+            </div>
+
+            <!-- MARK SECTION -->
+            <h2>Academic Marks (Scores out of 100)</h2>
+            <div class="table-responsive">
+            {% if marks %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Exam Type</th>
+                            <th>Score</th>
+                            <th>Date Recorded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mark in marks %}
+                        <tr>
+                            <td>{{ mark.subject.name }}</td>
+                            <td>{{ mark.get_exam_type_display }}</td>
+                            <td><span class="score-highlight">{{ mark.score }}</span></td>
+                            <td>{{ mark.date_recorded|date:"d M Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No marks have been recorded for this student yet.</p>
+            {% endif %}
+            </div>
+
+            <!-- ATTENDANCE SECTION -->
+            <h2>Recent Attendance (Last 30 Days)</h2>
+            <div class="table-responsive">
+            {% if attendance_records %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in attendance_records %}
+                        <tr>
+                            <td>{{ record.date|date:"d M Y" }}</td>
+                            <td>({{ record.date|date:"l" }})</td>
+                            <td>
+                                <span class="{% if record.status == 'P' %}present{% elif record.status == 'A' %}absent{% elif record.status == 'L' %}late{% endif %}">
+                                    {{ record.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No recent attendance records found.</p>
+            {% endif %}
+            </div>
+            
+        {% endif %}
+    </div>
+</body>
+</html>
